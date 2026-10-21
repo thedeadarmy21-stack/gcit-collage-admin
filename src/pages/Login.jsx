@@ -38,7 +38,7 @@ const Login = () => {
           <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-100 shadow-lg shadow-green-600/10 p-2">
             <img src="/logo.png" alt="GCIT Logo" className="h-full w-full object-contain" />
           </div>
-          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">GCIT Collage</h2>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">GCIT COLLAGE</h2>
           <p className="text-slate-500 mt-2 font-medium">Admin Portal Login</p>
         </div>
         

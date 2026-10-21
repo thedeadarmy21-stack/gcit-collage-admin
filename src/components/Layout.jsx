@@ -1,12 +1,23 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { API_BASE } from '../config';
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+  const token = localStorage.getItem('adminToken');
   
   const [isDark, setIsDark] = useState(localStorage.getItem('theme') === 'dark');
+
+  // 🤖 AI Chatbot States
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([{ role: 'ai', text: 'Assalam-o-Alaikum Sir! Main GCIT AI hoon. Aap mujhse bolkar ya likhkar kuch bhi pooch sakte hain.' }]);
+  const [inputMsg, setInputMsg] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
     if (isDark) {
@@ -17,6 +28,10 @@ const Layout = ({ children }) => {
       localStorage.setItem('theme', 'light');
     }
   }, [isDark]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -41,8 +56,62 @@ const Layout = ({ children }) => {
 
   const displayName = 'Sir Principal';
 
+  // 🤖 AI Chat Handler
+  const handleSendMessage = async (textOverride = null) => {
+    const messageToSend = textOverride || inputMsg;
+    if (!messageToSend.trim()) return;
+
+    setMessages(prev => [...prev, { role: 'user', text: messageToSend }]);
+    if (!textOverride) setInputMsg('');
+    setIsTyping(true);
+
+    try {
+      const res = await axios.post(`${API_BASE}/api/attendance/ask-ai`, 
+        { question: messageToSend },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const aiAnswer = res.data.answer;
+      setMessages(prev => [...prev, { role: 'ai', text: aiAnswer }]);
+      
+      // 🔊 Voice Output (Text to Speech)
+      const speech = new SpeechSynthesisUtterance(aiAnswer);
+      speech.lang = 'hi-IN'; // Hindi/Hinglish accent
+      speech.rate = 1.0;
+      window.speechSynthesis.speak(speech);
+
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'ai', text: 'Bhai, thoda network issue hai. Dobara try karo.' }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  // 🎤 Voice Input Handler
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Aapka browser voice recognition support nahi karta. Chrome use karein.');
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = 'hi-IN'; // Hindi/Hinglish
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInputMsg(transcript);
+      handleSendMessage(transcript); // Direct send
+    };
+
+    recognition.start();
+  };
+
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 relative">
       
       {/* Premium Sidebar */}
       <aside className="w-64 bg-slate-900 dark:bg-slate-950 text-white flex flex-col shadow-2xl z-20 transition-colors duration-300 border-r border-slate-800">
@@ -79,12 +148,10 @@ const Layout = ({ children }) => {
 
         {/* USER PROFILE SECTION */}
         <div className="p-5 border-t border-slate-800/80 bg-slate-950">
-          
           <div className="flex items-center gap-3 mb-5">
             <div className="h-11 w-11 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-green-900/50 border-2 border-slate-800">
               {displayName.charAt(0)}
             </div>
-            
             <div className="overflow-hidden">
               <p className="text-sm font-bold text-white truncate">{displayName}</p>
               <p className="text-xs font-medium text-slate-500 truncate">GCIT COLLAGE</p>
@@ -123,6 +190,82 @@ const Layout = ({ children }) => {
         </header>
         <div className="p-8 max-w-7xl mx-auto">{children}</div>
       </main>
+
+      {/* 🤖 FLOATING AI CHATBOT */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        
+        {/* Chat Window */}
+        {isChatOpen && (
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl w-80 sm:w-96 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 mb-4 overflow-hidden animate-pop flex flex-col h-[500px]">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-600 to-green-800 p-4 text-white flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
+                <div>
+                  <h3 className="font-bold text-sm">GCIT AI Assistant</h3>
+                  <p className="text-[10px] text-green-100">Always here to help</p>
+                </div>
+              </div>
+              <button onClick={() => setIsChatOpen(false)} className="text-white hover:bg-white/20 p-1 rounded-lg transition">✕</button>
+            </div>
+
+            {/* Chat Body */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50 dark:bg-slate-900/50">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm font-medium ${msg.role === 'user' ? 'bg-green-600 text-white rounded-br-sm' : 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm border border-slate-100 dark:border-slate-600 rounded-bl-sm'}`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-white dark:bg-slate-700 p-3 rounded-2xl rounded-bl-sm shadow-sm border border-slate-100 dark:border-slate-600 flex gap-1">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></span>
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-100"></span>
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-200"></span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Input Area */}
+            <div className="p-3 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex gap-2">
+              <input 
+                type="text" 
+                value={inputMsg}
+                onChange={(e) => setInputMsg(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Kuch poochiye..." 
+                className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl focus:ring-2 focus:ring-green-500 text-sm dark:text-white outline-none"
+              />
+              <button 
+                onClick={handleVoiceInput}
+                className={`p-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-white hover:bg-slate-300'}`}
+                title="Speak"
+              >
+                {isListening ? '🔴' : '🎤'}
+              </button>
+              <button 
+                onClick={() => handleSendMessage()}
+                className="p-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all"
+              >
+                ➤
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Button */}
+        <button 
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className="w-14 h-14 bg-gradient-to-r from-green-600 to-green-800 text-white rounded-full flex items-center justify-center shadow-xl shadow-green-900/50 hover:scale-110 transition-transform relative"
+        >
+          <span className="text-2xl">{isChatOpen ? '✕' : '🤖'}</span>
+          {!isChatOpen && <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>}
+        </button>
+      </div>
     </div>
   );
 };

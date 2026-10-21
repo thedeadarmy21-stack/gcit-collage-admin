@@ -35,8 +35,8 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <div className="bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] w-full max-w-md border border-slate-100">
         <div className="text-center mb-10">
-          <div className="h-16 w-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">🎓</span>
+          <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-100 shadow-lg shadow-green-600/10 p-2">
+            <img src="/logo.png" alt="GCIT Logo" className="h-full w-full object-contain" />
           </div>
           <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">GCIT Collage</h2>
           <p className="text-slate-500 mt-2 font-medium">Admin Portal Login</p>
@@ -56,7 +56,7 @@ const Login = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-800"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-all text-slate-800"
               placeholder="Enter username"
               required
             />
@@ -68,7 +68,7 @@ const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-800"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-all text-slate-800"
               placeholder="Enter password"
               required
             />
@@ -77,7 +77,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-blue-700 transition duration-200 shadow-lg shadow-blue-600/30 mt-2 flex justify-center items-center"
+            className="w-full bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-green-800 transition duration-200 shadow-lg shadow-green-700/30 mt-2 flex justify-center items-center"
           >
             {loading ? (
               <span className="flex items-center gap-2">

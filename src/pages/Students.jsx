@@ -47,7 +47,6 @@ const Students = () => {
     }
   };
 
-  // 🌟 FINAL PREMIUM ID CARD (No Logo, Just Clean Typography)
   const generateIDCardPDF = async (doc, student, isFirst) => {
     if (!isFirst) doc.addPage([85.6, 54], 'landscape');
     
@@ -57,66 +56,61 @@ const Students = () => {
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, 85.6, 54, 'F');
 
-    // 2. Top Header Wave (Dark Teal)
-    doc.setFillColor(15, 118, 110); // Teal-700
-    doc.rect(0, 0, 85.6, 20, 'F');
+    // 2. Top Header (Green Theme)
+    doc.setFillColor(22, 101, 52); // Green-800
+    doc.rect(0, 0, 85.6, 18, 'F');
     
-    // 3. Top Right Green Blob
-    doc.setFillColor(22, 163, 74); // Green-600
+    // 3. Top Right Blob (Lighter Green)
+    doc.setFillColor(34, 197, 94); // Green-500
     doc.ellipse(85.6, 0, 30, 18, 'F');
 
-    // 4. Bottom Wave (Light Teal)
-    doc.setFillColor(240, 253, 250); // Teal-50
-    doc.rect(0, 42, 85.6, 12, 'F');
+    // 4. Bottom Wave (Light Green)
+    doc.setFillColor(240, 253, 244); // Green-50
+    doc.rect(0, 44, 85.6, 10, 'F');
 
-    // 🚀 5. PROFESSIONAL COLLEGE NAME (No Logo, Just Text)
+    // 🚀 5. COLLEGE NAME & LOGO
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(12);
-    doc.setFont('times', 'bold'); // Premium Serif Font
-    doc.text('GCIT COLLAGE', 10, 9); 
+    doc.setFontSize(10);
+    doc.setFont('times', 'bold'); 
+    doc.text('GCIT COLLAGE', 10, 7); 
     
-    doc.setFontSize(6);
+    doc.setFontSize(5);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(200, 250, 240); // Light Teal text for tagline
-    doc.text('Excellence in Education', 10, 14);
+    doc.setTextColor(200, 250, 210); 
+    doc.text('Excellence in Education', 10, 11);
 
-    // 6. Big Title (Times New Roman for Premium Look)
+    // 6. Big Title
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
     doc.setFont('times', 'bold');
-    doc.text('STUDENT', 45, 11);
-    doc.text('ID CARD', 45, 18);
+    doc.text('STUDENT', 52, 9);
+    doc.text('ID CARD', 52, 16);
 
-    // 7. Student Details (Right Side)
-    doc.setTextColor(30, 41, 59); // Slate-800
+    // 7. Student Details
+    doc.setTextColor(30, 41, 59); 
     
-    // Labels (Bold)
     doc.setFontSize(7);
     doc.setFont('helvetica', 'bold');
-    doc.text('Name', 38, 26);
-    doc.text('Roll No', 38, 32);
-    doc.text('Class', 38, 38);
-    doc.text('Father', 38, 44);
+    doc.text('Name', 38, 24);
+    doc.text('Roll No', 38, 30);
+    doc.text('Class', 38, 36);
+    doc.text('Father', 38, 42);
 
-    // Colons
-    doc.text(':', 50, 26);
-    doc.text(':', 50, 32);
-    doc.text(':', 50, 38);
-    doc.text(':', 50, 44);
+    doc.text(':', 50, 24);
+    doc.text(':', 50, 30);
+    doc.text(':', 50, 36);
+    doc.text(':', 50, 42);
 
-    // Values (Normal)
     doc.setFont('helvetica', 'normal');
-    doc.text(student.name.toUpperCase(), 54, 26);
-    doc.text(student.rollNumber, 54, 32);
-    doc.text(`${student.className} - ${student.section}`, 54, 38);
-    doc.text(student.fatherName, 54, 44);
+    doc.text(student.name.toUpperCase(), 54, 24);
+    doc.text(student.rollNumber, 54, 30);
+    doc.text(`${student.className} - ${student.section}`, 54, 36);
+    doc.text(student.fatherName, 54, 42);
 
-    // 8. BIG QR Code (Left Side)
-    // Border Frame
-    doc.setDrawColor(15, 118, 110); // Teal Border
+    // 8. QR Code
+    doc.setDrawColor(22, 101, 52); 
     doc.setLineWidth(0.8);
     doc.rect(8, 21, 26, 26, 'S'); 
-    // QR Image
     doc.addImage(qrDataUrl, 'PNG', 9, 22, 24, 24); 
   };
 
@@ -161,7 +155,7 @@ const Students = () => {
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div>
     </div>
   );
 
@@ -181,13 +175,13 @@ const Students = () => {
               placeholder="Search..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-56"
+              className="pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 w-full sm:w-56"
             />
           </div>
           <select 
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="">All Classes</option>
             {uniqueClasses.map((cls, idx) => (
@@ -197,11 +191,11 @@ const Students = () => {
           <button 
             onClick={downloadAllIDCards}
             disabled={downloadingAll}
-            className="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2"
+            className="bg-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-green-800 transition-all shadow-md shadow-green-700/20 flex items-center justify-center gap-2"
           >
             <span>🖨️</span> {downloadingAll ? 'Printing...' : 'Print All IDs'}
           </button>
-          <Link to="/add-student" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
+          <Link to="/add-student" className="bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 transition-all shadow-md shadow-green-600/20 flex items-center justify-center gap-2">
             <span>➕</span> Add Student
           </Link>
         </div>
@@ -223,16 +217,16 @@ const Students = () => {
                <tr><td colSpan="5" className="p-10 text-center text-slate-500 dark:text-slate-400 font-medium">No students found matching your search.</td></tr>
             ) : (
               filteredStudents.map((student) => (
-                <tr key={student._id} className="hover:bg-blue-50/50 dark:hover:bg-slate-700/50 transition-colors">
+                <tr key={student._id} className="hover:bg-green-50/50 dark:hover:bg-slate-700/50 transition-colors">
                   <td className="p-5">
                     <div 
                       onClick={() => navigate(`/student/${student._id}`)}
                       className="flex items-center gap-3 cursor-pointer group"
                     >
-                      <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                      <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 flex items-center justify-center font-bold group-hover:bg-green-600 group-hover:text-white transition-colors">
                         {student.name.charAt(0)}
                       </div>
-                      <span className="font-bold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors underline-offset-4 group-hover:underline">
+                      <span className="font-bold text-slate-800 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors underline-offset-4 group-hover:underline">
                         {student.name}
                       </span>
                     </div>

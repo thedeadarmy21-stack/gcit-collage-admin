@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
 
   // 🤖 AI Chatbot States
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [messages, setMessages] = useState([{ role: 'ai', text: 'Assalam-o-Alaikum Sir! Main GCIT AI hoon. Aap mujhse bolkar ya likhkar kuch bhi pooch sakte hain.' }]);
+  const [messages, setMessages] = useState([{ role: 'ai', text: 'Assalam-o-Alaikum Sir! Main GCIT AI hoon. Aap mujhse school ke kisi bhi student ya attendance ke baare me kuch bhi pooch sakte hain.' }]);
   const [inputMsg, setInputMsg] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -56,6 +56,25 @@ const Layout = ({ children }) => {
 
   const displayName = 'Sir Principal';
 
+  // 🎙️ Natural Voice Select karne ka function
+  const speakText = (text) => {
+    const speech = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Best Hindi/Indian English voice dhoondo
+    const bestVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('hi')) || 
+                      voices.find(v => v.name.includes('Google') && v.lang.includes('en-IN')) ||
+                      voices.find(v => v.lang.includes('hi-IN')) ||
+                      voices[0];
+
+    if (bestVoice) speech.voice = bestVoice;
+    
+    speech.lang = 'hi-IN'; 
+    speech.rate = 0.95; // Thoda slow taaki insaan jaisa lage
+    speech.pitch = 1.05; // Thoda sa high pitch for friendly tone
+    window.speechSynthesis.speak(speech);
+  };
+
   // 🤖 AI Chat Handler
   const handleSendMessage = async (textOverride = null) => {
     const messageToSend = textOverride || inputMsg;
@@ -74,11 +93,8 @@ const Layout = ({ children }) => {
       const aiAnswer = res.data.answer;
       setMessages(prev => [...prev, { role: 'ai', text: aiAnswer }]);
       
-      // 🔊 Voice Output (Text to Speech)
-      const speech = new SpeechSynthesisUtterance(aiAnswer);
-      speech.lang = 'hi-IN'; // Hindi/Hinglish accent
-      speech.rate = 1.0;
-      window.speechSynthesis.speak(speech);
+      // 🔊 Natural Voice Output
+      speakText(aiAnswer);
 
     } catch (error) {
       setMessages(prev => [...prev, { role: 'ai', text: 'Bhai, thoda network issue hai. Dobara try karo.' }]);
@@ -203,7 +219,7 @@ const Layout = ({ children }) => {
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
                 <div>
                   <h3 className="font-bold text-sm">GCIT AI Assistant</h3>
-                  <p className="text-[10px] text-green-100">Always here to help</p>
+                  <p className="text-[10px] text-green-100">Friendly & Smart</p>
                 </div>
               </div>
               <button onClick={() => setIsChatOpen(false)} className="text-white hover:bg-white/20 p-1 rounded-lg transition">✕</button>

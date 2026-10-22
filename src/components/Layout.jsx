@@ -56,29 +56,23 @@ const Layout = ({ children }) => {
 
   const displayName = 'Sir Principal';
 
-  // 🎙️ Backend se Natural Voice (MP3) laakar play karo
-  const speakText = async (text) => {
-    try {
-      const response = await axios.post(`${API_BASE}/api/attendance/generate-voice`, 
-        { text },
-        { 
-          headers: { Authorization: `Bearer ${token}` },
-          responseType: 'blob' // Important: MP3 file receive karne ke liye
-        }
-      );
+  // 🎙️ Natural Voice Select karne ka function
+  const speakText = (text) => {
+    const speech = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Best Hindi/Indian English voice dhoondo
+    const bestVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('hi')) || 
+                      voices.find(v => v.name.includes('Google') && v.lang.includes('en-IN')) ||
+                      voices.find(v => v.lang.includes('hi-IN')) ||
+                      voices[0];
 
-      // Blob ko URL me convert karo aur play karo
-      const audioUrl = URL.createObjectURL(response.data);
-      const audio = new Audio(audioUrl);
-      audio.play();
-      
-    } catch (error) {
-      console.error('Voice Error:', error);
-      // Agar voice fail ho jaye toh text-to-speech fallback use karo
-      const speech = new SpeechSynthesisUtterance(text);
-      speech.lang = 'hi-IN';
-      window.speechSynthesis.speak(speech);
-    }
+    if (bestVoice) speech.voice = bestVoice;
+    
+    speech.lang = 'hi-IN'; 
+    speech.rate = 0.95; // Thoda slow taaki insaan jaisa lage
+    speech.pitch = 1.05; // Thoda sa high pitch for friendly tone
+    window.speechSynthesis.speak(speech);
   };
 
   // 🤖 AI Chat Handler
@@ -99,8 +93,8 @@ const Layout = ({ children }) => {
       const aiAnswer = res.data.answer;
       setMessages(prev => [...prev, { role: 'ai', text: aiAnswer }]);
       
-      // 🔊 Natural Voice Output (Edge TTS)
-      await speakText(aiAnswer);
+      // 🔊 Natural Voice Output
+      speakText(aiAnswer);
 
     } catch (error) {
       setMessages(prev => [...prev, { role: 'ai', text: 'Bhai, thoda network issue hai. Dobara try karo.' }]);
@@ -117,7 +111,7 @@ const Layout = ({ children }) => {
     }
 
     const recognition = new window.webkitSpeechRecognition();
-    recognition.lang = 'hi-IN';
+    recognition.lang = 'hi-IN'; // Hindi/Hinglish
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsListening(true);
@@ -126,7 +120,7 @@ const Layout = ({ children }) => {
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInputMsg(transcript);
-      handleSendMessage(transcript);
+      handleSendMessage(transcript); // Direct send
     };
 
     recognition.start();

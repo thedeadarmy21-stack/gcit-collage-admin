@@ -56,22 +56,22 @@ const Layout = ({ children }) => {
 
   const displayName = 'Sir Principal';
 
-  // 🎙️ Natural Voice (Indian English accent for Hinglish)
+  // 🎙️ Natural Voice (Wapas Hindi Female Voice)
   const speakText = (text) => {
     const speech = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
     
-    // Best Indian English voice dhoondo (jo Hinglish ko sahi bole)
-    const bestVoice = voices.find(v => v.lang === 'en-IN') || 
-                      voices.find(v => v.name.includes('India')) ||
-                      voices.find(v => v.lang.includes('en')) ||
+    // Best Hindi Female voice dhoondo
+    const bestVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('hi')) || 
+                      voices.find(v => v.lang.includes('hi-IN')) ||
+                      voices.find(v => v.lang.includes('en-IN')) ||
                       voices[0];
 
     if (bestVoice) speech.voice = bestVoice;
     
-    speech.lang = 'en-IN'; // Indian English accent
-    speech.rate = 1.0; 
-    speech.pitch = 1.0; 
+    speech.lang = 'hi-IN'; // Wapas Hindi
+    speech.rate = 0.95; // Slow for human feel
+    speech.pitch = 1.05; // Friendly tone
     window.speechSynthesis.speak(speech);
   };
 
@@ -103,7 +103,7 @@ const Layout = ({ children }) => {
     }
   };
 
-  // 🎤 Voice Input Handler (Fix: Automatic send & clear)
+  // 🎤 Voice Input Handler
   const handleVoiceInput = () => {
     if (!('webkitSpeechRecognition' in window)) {
       alert('Aapka browser voice recognition support nahi karta. Chrome use karein.');
@@ -111,20 +111,20 @@ const Layout = ({ children }) => {
     }
 
     const recognition = new window.webkitSpeechRecognition();
-    recognition.lang = 'hi-IN'; // Hindi bolne ke liye
+    recognition.lang = 'hi-IN'; // Hindi/Hinglish input
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsListening(true);
     
     recognition.onend = () => {
       setIsListening(false);
-      setInputMsg(''); // Mic band hone par text box clear karo
+      setInputMsg(''); // Mic band hone par text box clear
     };
     
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInputMsg(transcript);
-      handleSendMessage(transcript); // Direct send
+      handleSendMessage(transcript);
     };
 
     recognition.start();

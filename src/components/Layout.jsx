@@ -13,10 +13,14 @@ const Layout = ({ children }) => {
 
   // 🤖 AI Chatbot States
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [messages, setMessages] = useState([{ role: 'ai', text: 'Assalam-o-Alaikum Sir! Main GCIT AI hoon. Aap mujhse school ke kisi bhi student ya attendance ke baare me kuch bhi pooch sakte hain.' }]);
+  const [messages, setMessages] = useState([{ role: 'ai', text: 'Assalam-o-Alaikum Sir! Main GCIT AI hoon. Aap mode switch karke mujhse College ka data ya General Knowledge kuch bhi pooch sakte hain.' }]);
   const [inputMsg, setInputMsg] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  
+  // 🚀 Mode State (true = College Mode, false = General Mode)
+  const [isCollegeMode, setIsCollegeMode] = useState(true); 
+  
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -56,12 +60,11 @@ const Layout = ({ children }) => {
 
   const displayName = 'Sir Principal';
 
-  // 🎙️ Natural Voice (Wapas Hindi Female Voice)
+  // 🎙️ Natural Voice (Hindi Female - Same as before)
   const speakText = (text) => {
     const speech = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
     
-    // Best Hindi Female voice dhoondo
     const bestVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('hi')) || 
                       voices.find(v => v.lang.includes('hi-IN')) ||
                       voices.find(v => v.lang.includes('en-IN')) ||
@@ -69,10 +72,24 @@ const Layout = ({ children }) => {
 
     if (bestVoice) speech.voice = bestVoice;
     
-    speech.lang = 'hi-IN'; // Wapas Hindi
-    speech.rate = 0.95; // Slow for human feel
-    speech.pitch = 1.05; // Friendly tone
+    speech.lang = 'hi-IN'; 
+    speech.rate = 0.95; 
+    speech.pitch = 1.05; 
     window.speechSynthesis.speak(speech);
+  };
+
+  // 🚀 Mode Change Function
+  const toggleMode = () => {
+    const newMode = !isCollegeMode;
+    setIsCollegeMode(newMode);
+    
+    // Jab button click ho, AI khud bataye
+    const modeMsg = newMode 
+      ? "Sir, main ab College Mode me hoon. Aap mujhse students ya attendance ke baare me pooch sakte hain." 
+      : "Sir, main ab General Knowledge mode me hoon. Aap mujhse kuch bhi pooch sakte hain.";
+    
+    setMessages(prev => [...prev, { role: 'ai', text: modeMsg }]);
+    speakText(modeMsg);
   };
 
   // 🤖 AI Chat Handler
@@ -86,14 +103,16 @@ const Layout = ({ children }) => {
 
     try {
       const res = await axios.post(`${API_BASE}/api/attendance/ask-ai`, 
-        { question: messageToSend },
+        { 
+          question: messageToSend,
+          mode: isCollegeMode ? 'college' : 'general' // 🚀 Mode bhej rahe hain
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       const aiAnswer = res.data.answer;
       setMessages(prev => [...prev, { role: 'ai', text: aiAnswer }]);
       
-      // 🔊 Natural Voice Output
       speakText(aiAnswer);
 
     } catch (error) {
@@ -103,7 +122,7 @@ const Layout = ({ children }) => {
     }
   };
 
-  // 🎤 Voice Input Handler
+  // 🎤 Professional Voice Input Handler
   const handleVoiceInput = () => {
     if (!('webkitSpeechRecognition' in window)) {
       alert('Aapka browser voice recognition support nahi karta. Chrome use karein.');
@@ -111,14 +130,14 @@ const Layout = ({ children }) => {
     }
 
     const recognition = new window.webkitSpeechRecognition();
-    recognition.lang = 'hi-IN'; // Hindi/Hinglish input
+    recognition.lang = 'hi-IN';
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsListening(true);
     
     recognition.onend = () => {
       setIsListening(false);
-      setInputMsg(''); // Mic band hone par text box clear
+      setInputMsg(''); // Mic band hone par clear
     };
     
     recognition.onresult = (event) => {
@@ -217,16 +236,28 @@ const Layout = ({ children }) => {
         {/* Chat Window */}
         {isChatOpen && (
           <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl w-80 sm:w-96 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 mb-4 overflow-hidden animate-pop flex flex-col h-[500px]">
-            {/* Header */}
+            
+            {/* Header with Mode Toggle Button */}
             <div className="bg-gradient-to-r from-green-600 to-green-800 p-4 text-white flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
+                <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-lg">🤖</div>
                 <div>
-                  <h3 className="font-bold text-sm">GCIT AI Assistant</h3>
-                  <p className="text-[10px] text-green-100">Friendly & Smart</p>
+                  <h3 className="font-bold text-sm">GCIT AI</h3>
+                  
+                  {/* 🚀 PROFESSIONAL MODE TOGGLE BUTTON */}
+                  <button 
+                    onClick={toggleMode}
+                    className="flex items-center gap-2 mt-1 bg-black/20 hover:bg-black/40 px-2.5 py-1 rounded-lg transition-all duration-300 border border-white/10"
+                  >
+                    <span className={`w-2 h-2 rounded-full transition-colors ${isCollegeMode ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
+                    <span className="text-[10px] font-bold tracking-wide">
+                      {isCollegeMode ? 'COLLEGE MODE' : 'GENERAL MODE'}
+                    </span>
+                    <svg className="w-3 h-3 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                  </button>
                 </div>
               </div>
-              <button onClick={() => setIsChatOpen(false)} className="text-white hover:bg-white/20 p-1 rounded-lg transition">✕</button>
+              <button onClick={() => setIsChatOpen(false)} className="text-white hover:bg-white/20 p-1.5 rounded-lg transition">✕</button>
             </div>
 
             {/* Chat Body */}
@@ -257,21 +288,31 @@ const Layout = ({ children }) => {
                 value={inputMsg}
                 onChange={(e) => setInputMsg(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Kuch poochiye..." 
+                placeholder={isCollegeMode ? "Poocho student ke baare me..." : "Poocho kuch bhi (ChatGPT)..."} 
                 className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl focus:ring-2 focus:ring-green-500 text-sm dark:text-white outline-none"
               />
+              
+              {/* 🎤 PROFESSIONAL MIC BUTTON */}
               <button 
                 onClick={handleVoiceInput}
-                className={`p-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-white hover:bg-slate-300'}`}
+                className={`p-2.5 rounded-xl transition-all duration-300 ${isListening ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/50' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600'}`}
                 title="Speak"
               >
-                {isListening ? '🔴' : '🎤'}
+                {isListening ? (
+                  <span className="flex items-center justify-center w-5 h-5 relative">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                  </span>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                )}
               </button>
+              
               <button 
                 onClick={() => handleSendMessage()}
-                className="p-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all"
+                className="p-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all shadow-lg shadow-green-600/30"
               >
-                ➤
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
               </button>
             </div>
           </div>

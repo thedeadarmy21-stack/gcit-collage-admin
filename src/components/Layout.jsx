@@ -62,6 +62,9 @@ const Layout = ({ children }) => {
 
   // 🎙️ Natural Voice (Hindi Female - Same as before)
   const speakText = (text) => {
+    // 🛑 Purani awaz ko rok do (agar chal rahi hai)
+    window.speechSynthesis.cancel(); 
+
     const speech = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
     
@@ -80,6 +83,9 @@ const Layout = ({ children }) => {
 
   // 🚀 Mode Change Function
   const toggleMode = () => {
+    // 🛑 Mode change karte hi purani awaz rok do
+    window.speechSynthesis.cancel();
+
     const newMode = !isCollegeMode;
     setIsCollegeMode(newMode);
     
@@ -97,6 +103,9 @@ const Layout = ({ children }) => {
     const messageToSend = textOverride || inputMsg;
     if (!messageToSend.trim()) return;
 
+    // 🛑 Naya message aate hi purani awaz rok do
+    window.speechSynthesis.cancel();
+
     setMessages(prev => [...prev, { role: 'user', text: messageToSend }]);
     if (!textOverride) setInputMsg('');
     setIsTyping(true);
@@ -105,7 +114,7 @@ const Layout = ({ children }) => {
       const res = await axios.post(`${API_BASE}/api/attendance/ask-ai`, 
         { 
           question: messageToSend,
-          mode: isCollegeMode ? 'college' : 'general' // 🚀 Mode bhej rahe hain
+          mode: isCollegeMode ? 'college' : 'general'
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -129,6 +138,9 @@ const Layout = ({ children }) => {
       return;
     }
 
+    // 🛑 Mic dabate hi purani awaz rok do
+    window.speechSynthesis.cancel();
+
     const recognition = new window.webkitSpeechRecognition();
     recognition.lang = 'hi-IN';
     recognition.interimResults = false;
@@ -137,7 +149,7 @@ const Layout = ({ children }) => {
     
     recognition.onend = () => {
       setIsListening(false);
-      setInputMsg(''); // Mic band hone par clear
+      setInputMsg(''); 
     };
     
     recognition.onresult = (event) => {

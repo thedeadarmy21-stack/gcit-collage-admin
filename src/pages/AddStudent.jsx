@@ -7,7 +7,7 @@ const AddStudent = () => {
   const [formData, setFormData] = useState({
     name: '', rollNumber: '', className: '', section: 'A', fatherName: '', fatherWhatsApp: '', fatherEmail: ''
   });
-  const [image, setImage] = useState(null); // 🚀 NAYA: Photo State
+  const [image, setImage] = useState(null); 
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,7 +18,6 @@ const AddStudent = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 🚀 Photo select karne ka function
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -32,16 +31,22 @@ const AddStudent = () => {
     setLoading(true);
     setError('');
 
-    const data = new FormData();
-    Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    if (image) data.append('photo', image); // Photo add ki
-
     try {
-      await axios.post(`${API_BASE}/api/students/add`, data, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data' 
-        },
+      // 🚀 Image ko Base64 me convert karo
+      let photoBase64 = null;
+      if (image) {
+        photoBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(image);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      }
+
+      const dataToSend = { ...formData, photoBase64 };
+
+      await axios.post(`${API_BASE}/api/students/add`, dataToSend, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       navigate('/students');
     } catch (err) {

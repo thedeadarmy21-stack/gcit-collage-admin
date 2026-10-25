@@ -7,6 +7,8 @@ const AddStudent = () => {
   const [formData, setFormData] = useState({
     name: '', rollNumber: '', className: '', section: 'A', fatherName: '', fatherWhatsApp: '', fatherEmail: ''
   });
+  const [image, setImage] = useState(null); // 🚀 NAYA: Photo State
+  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -16,13 +18,30 @@ const AddStudent = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 🚀 Photo select karne ka function
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    const data = new FormData();
+    Object.keys(formData).forEach(key => data.append(key, formData[key]));
+    if (image) data.append('photo', image); // Photo add ki
+
     try {
-      await axios.post(`${API_BASE}/api/students/add`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
+      await axios.post(`${API_BASE}/api/students/add`, data, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data' 
+        },
       });
       navigate('/students');
     } catch (err) {
@@ -36,12 +55,29 @@ const AddStudent = () => {
     <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800/80 backdrop-blur-lg p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors duration-300">
       <div className="mb-8">
         <h3 className="text-2xl font-extrabold text-slate-800 dark:text-white">Add New Student</h3>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Enter details to generate their secure QR ID card.</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Enter details & upload photo for Face Recognition.</p>
       </div>
 
       {error && <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl mb-6 text-sm font-bold border border-red-100 dark:border-red-800 flex items-center gap-2"><span>⚠️</span>{error}</div>}
       
       <form onSubmit={handleSubmit} className="space-y-6">
+        
+        {/* 🚀 PHOTO UPLOAD SECTION */}
+        <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
+          <div className="h-24 w-24 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden mb-4 shadow-inner border-2 border-green-500">
+            {preview ? (
+              <img src={preview} alt="Preview" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-3xl text-slate-400">👤</span>
+            )}
+          </div>
+          <label className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-700 transition">
+            Upload Student Photo
+            <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+          </label>
+          <p className="text-xs text-slate-500 mt-2">Clear face photo (For AI Attendance)</p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
@@ -74,7 +110,6 @@ const AddStudent = () => {
         </div>
         
         <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
-          {/* 🚀 GREEN BUTTON */}
           <button type="submit" disabled={loading} className="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition-all shadow-lg shadow-green-600/30 flex justify-center items-center gap-2">
             {loading ? (
               <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Saving...</>

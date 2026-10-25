@@ -57,18 +57,18 @@ const Students = () => {
     doc.rect(0, 0, 85.6, 54, 'F');
 
     // 2. Top Header (Green Theme)
-    doc.setFillColor(22, 101, 52); // Green-800
+    doc.setFillColor(22, 101, 52);
     doc.rect(0, 0, 85.6, 18, 'F');
     
-    // 3. Top Right Blob (Lighter Green)
-    doc.setFillColor(34, 197, 94); // Green-500
+    // 3. Top Right Blob
+    doc.setFillColor(34, 197, 94);
     doc.ellipse(85.6, 0, 30, 18, 'F');
 
-    // 4. Bottom Wave (Light Green)
-    doc.setFillColor(240, 253, 244); // Green-50
+    // 4. Bottom Wave
+    doc.setFillColor(240, 253, 244);
     doc.rect(0, 44, 85.6, 10, 'F');
 
-    // 🚀 5. COLLEGE NAME & LOGO
+    // 5. COLLEGE NAME
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
     doc.setFont('times', 'bold'); 
@@ -88,7 +88,6 @@ const Students = () => {
 
     // 7. Student Details
     doc.setTextColor(30, 41, 59); 
-    
     doc.setFontSize(7);
     doc.setFont('helvetica', 'bold');
     doc.text('Name', 38, 24);
@@ -223,9 +222,14 @@ const Students = () => {
                       onClick={() => navigate(`/student/${student._id}`)}
                       className="flex items-center gap-3 cursor-pointer group"
                     >
-                      <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 flex items-center justify-center font-bold group-hover:bg-green-600 group-hover:text-white transition-colors">
-                        {student.name.charAt(0)}
-                      </div>
+                      {/* 🚀 PHOTO DISPLAY LOGIC */}
+                      {student.photo ? (
+                        <img src={student.photo} alt={student.name} className="h-10 w-10 rounded-full object-cover border-2 border-green-500 shadow-sm" />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 flex items-center justify-center font-bold group-hover:bg-green-600 group-hover:text-white transition-colors">
+                          {student.name.charAt(0)}
+                        </div>
+                      )}
                       <span className="font-bold text-slate-800 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors underline-offset-4 group-hover:underline">
                         {student.name}
                       </span>

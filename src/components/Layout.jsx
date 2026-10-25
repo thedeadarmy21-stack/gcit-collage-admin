@@ -18,6 +18,9 @@ const Layout = ({ children }) => {
   const [isListening, setIsListening] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   
+  // 🚀 NAYA STATE: AI bol raha hai ya nahi
+  const [isSpeaking, setIsSpeaking] = useState(false); 
+  
   // 🚀 Mode State (true = College Mode, false = General Mode)
   const [isCollegeMode, setIsCollegeMode] = useState(true); 
   
@@ -63,6 +66,7 @@ const Layout = ({ children }) => {
   // 🎙️ Natural Voice (Hindi Female - Same as before)
   const speakText = (text) => {
     window.speechSynthesis.cancel(); 
+    setIsSpeaking(true); // AI bolna shuru kar raha hai
 
     const speech = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
@@ -77,12 +81,18 @@ const Layout = ({ children }) => {
     speech.lang = 'hi-IN'; 
     speech.rate = 0.95; 
     speech.pitch = 1.05; 
+
+    // Jab AI bolna khatam kare, state false kar do
+    speech.onend = () => setIsSpeaking(false);
+    speech.onerror = () => setIsSpeaking(false);
+
     window.speechSynthesis.speak(speech);
   };
 
   // 🚀 Mode Change Function
   const toggleMode = () => {
     window.speechSynthesis.cancel();
+    setIsSpeaking(false);
 
     const newMode = !isCollegeMode;
     setIsCollegeMode(newMode);
@@ -101,6 +111,7 @@ const Layout = ({ children }) => {
     if (!messageToSend.trim()) return;
 
     window.speechSynthesis.cancel();
+    setIsSpeaking(false);
 
     setMessages(prev => [...prev, { role: 'user', text: messageToSend }]);
     if (!textOverride) setInputMsg('');
@@ -127,8 +138,15 @@ const Layout = ({ children }) => {
     }
   };
 
-  // 🎤 Professional Voice Input Handler
+  // 🎤 Professional Voice Input Handler (UPDATED LOGIC)
   const handleVoiceInput = () => {
+    // 🛑 AGAR AI BOL RAHA HAI: Sirf awaz band karo, record mat karo
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return; // Function yahin ruk jayega
+    }
+
     if (!('webkitSpeechRecognition' in window)) {
       alert('Aapka browser voice recognition support nahi karta. Chrome use karein.');
       return;
@@ -137,10 +155,7 @@ const Layout = ({ children }) => {
     window.speechSynthesis.cancel();
 
     const recognition = new window.webkitSpeechRecognition();
-    
-    // 🚀 FIX: Language ko 'en-IN' kiya taaki Hinglish (English alphabets) me likhe
     recognition.lang = 'en-IN'; 
-    
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsListening(true);
@@ -305,14 +320,16 @@ const Layout = ({ children }) => {
               {/* 🎤 PROFESSIONAL MIC BUTTON */}
               <button 
                 onClick={handleVoiceInput}
-                className={`p-2.5 rounded-xl transition-all duration-300 ${isListening ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/50' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600'}`}
-                title="Speak"
+                className={`p-2.5 rounded-xl transition-all duration-300 ${isListening ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/50' : isSpeaking ? 'bg-green-600 text-white shadow-lg shadow-green-600/50' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600'}`}
+                title={isSpeaking ? "Stop AI Voice" : "Speak"}
               >
                 {isListening ? (
                   <span className="flex items-center justify-center w-5 h-5 relative">
                     <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
                   </span>
+                ) : isSpeaking ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
                 ) : (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
                 )}

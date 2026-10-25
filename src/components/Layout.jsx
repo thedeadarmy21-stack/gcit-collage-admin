@@ -138,13 +138,9 @@ const Layout = ({ children }) => {
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-[#0B1120] transition-colors duration-300 relative">
       
-      {/* 🚀 PREMIUM GLASSMORPHISM SIDEBAR */}
       <aside className="w-64 bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl text-slate-800 dark:text-white flex flex-col shadow-2xl z-20 transition-colors duration-300 border-r border-slate-200 dark:border-slate-800">
-        
-        {/* Logo Area */}
         <div className="h-20 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/80 bg-transparent">
           <h1 className="text-lg font-extrabold tracking-wide flex items-center gap-3">
-            {/* 🚀 FIXED LOGO: No white circle, transparent logo */}
             <img src="/logo.png" alt="GCIT Logo" className="h-10 w-10 object-contain drop-shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-green-800 dark:from-green-400 dark:to-green-600">
               GCIT COLLEGE
@@ -152,12 +148,9 @@ const Layout = ({ children }) => {
           </h1>
         </div>
         
-        {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 mt-2 overflow-y-auto">
           {menuItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
+            <Link key={item.name} to={item.path}
               className={`flex items-center space-x-3 px-4 py-3.5 rounded-xl transition-all duration-300 ${
                 location.pathname === item.path
                   ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg shadow-green-900/30 font-semibold translate-x-1'
@@ -170,7 +163,6 @@ const Layout = ({ children }) => {
           ))}
         </nav>
 
-        {/* USER PROFILE SECTION */}
         <div className="p-5 border-t border-slate-200 dark:border-slate-800/80 bg-transparent">
           <div className="flex items-center gap-3 mb-5">
             <div className="h-11 w-11 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-green-900/50">
@@ -181,34 +173,25 @@ const Layout = ({ children }) => {
               <p className="text-xs font-medium text-slate-500 truncate">GCIT COLLEGE</p>
             </div>
           </div>
-          
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 group"
-          >
+          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300">
             Logout
           </button>
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative">
         <header className="h-20 bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 flex justify-between items-center px-8 sticky top-0 z-10 transition-colors duration-300">
           <h2 className="text-xl font-bold text-slate-800 dark:text-white capitalize tracking-tight">
             {location.pathname.replace('/', '').replace('-', ' ')}
           </h2>
-          
-          <button 
-            onClick={() => setIsDark(!isDark)}
-            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-yellow-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2 font-bold text-sm"
-          >
+          <button onClick={() => setIsDark(!isDark)} className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-yellow-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2 font-bold text-sm">
             {isDark ? 'Light' : 'Dark'}
           </button>
         </header>
         <div className="p-8 max-w-7xl mx-auto">{children}</div>
       </main>
 
-      {/* 🤖 FLOATING AI CHATBOT (Same as before) */}
+      {/* 🤖 FLOATING AI CHATBOT */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
         {isChatOpen && (
           <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl w-80 sm:w-96 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 mb-4 overflow-hidden animate-pop flex flex-col h-[500px]">
@@ -253,11 +236,36 @@ const Layout = ({ children }) => {
                 placeholder="Kuch poochiye..." 
                 className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl text-sm dark:text-white outline-none"
               />
-              <button onClick={handleVoiceInput} className={`p-2.5 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : isSpeaking ? 'bg-green-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-white'}`}>
-                {isListening ? '🔴' : isSpeaking ? '⏹️' : '🎤'}
+              
+              {/* 🎤 PROFESSIONAL MIC BUTTON */}
+              <button 
+                onClick={handleVoiceInput}
+                className={`p-2.5 rounded-xl transition-all duration-300 flex items-center justify-center ${
+                  isListening ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/50' 
+                  : isSpeaking ? 'bg-green-600 text-white shadow-lg shadow-green-600/50' 
+                  : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600'
+                }`}
+                title={isSpeaking ? "Stop AI Voice" : "Speak"}
+              >
+                {isListening ? (
+                  <span className="flex items-center justify-center w-5 h-5 relative">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                  </span>
+                ) : isSpeaking ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                )}
               </button>
-              <button onClick={() => handleSendMessage()} className="p-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 shadow-lg">
-                ➤
+              
+              <button onClick={() => handleSendMessage()} className="p-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/30">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
               </button>
             </div>
           </div>

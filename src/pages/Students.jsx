@@ -52,23 +52,18 @@ const Students = () => {
     
     const qrDataUrl = await QRCode.toDataURL(student.qrCode, { width: 400, margin: 1 });
     
-    // 1. Background White
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, 85.6, 54, 'F');
 
-    // 2. Top Header (Green Theme)
     doc.setFillColor(22, 101, 52);
     doc.rect(0, 0, 85.6, 18, 'F');
     
-    // 3. Top Right Blob
     doc.setFillColor(34, 197, 94);
     doc.ellipse(85.6, 0, 30, 18, 'F');
 
-    // 4. Bottom Wave
     doc.setFillColor(240, 253, 244);
     doc.rect(0, 44, 85.6, 10, 'F');
 
-    // 5. COLLEGE NAME
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
     doc.setFont('times', 'bold'); 
@@ -79,14 +74,12 @@ const Students = () => {
     doc.setTextColor(200, 250, 210); 
     doc.text('Excellence in Education', 10, 11);
 
-    // 6. Big Title
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
     doc.setFont('times', 'bold');
     doc.text('STUDENT', 52, 9);
     doc.text('ID CARD', 52, 16);
 
-    // 7. Student Details
     doc.setTextColor(30, 41, 59); 
     doc.setFontSize(7);
     doc.setFont('helvetica', 'bold');
@@ -106,7 +99,6 @@ const Students = () => {
     doc.text(`${student.className} - ${student.section}`, 54, 36);
     doc.text(student.fatherName, 54, 42);
 
-    // 8. QR Code
     doc.setDrawColor(22, 101, 52); 
     doc.setLineWidth(0.8);
     doc.rect(8, 21, 26, 26, 'S'); 
@@ -222,15 +214,19 @@ const Students = () => {
                       onClick={() => navigate(`/student/${student._id}`)}
                       className="flex items-center gap-3 cursor-pointer group"
                     >
-                      {/* 🚀 PHOTO DISPLAY LOGIC */}
+                      {/* 🚀 PHOTO HD & SHARP */}
                       {student.photo ? (
-                        <img src={student.photo} alt={student.name} className="h-10 w-10 rounded-full object-cover border-2 border-green-500 shadow-sm" />
+                        <img 
+                          src={student.photo} 
+                          alt={student.name} 
+                          className="h-12 w-12 rounded-full object-cover border-2 border-green-500 shadow-md group-hover:scale-110 transition-transform duration-300" 
+                        />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 flex items-center justify-center font-bold group-hover:bg-green-600 group-hover:text-white transition-colors">
+                        <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 flex items-center justify-center font-bold text-lg group-hover:bg-green-600 group-hover:text-white transition-colors border-2 border-green-500">
                           {student.name.charAt(0)}
                         </div>
                       )}
-                      <span className="font-bold text-slate-800 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors underline-offset-4 group-hover:underline">
+                      <span className="font-bold text-slate-800 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors underline-offset-4 group-hover:underline text-base">
                         {student.name}
                       </span>
                     </div>

@@ -28,7 +28,7 @@ const StudentProfile = () => {
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div>
     </div>
   );
 
@@ -41,16 +41,25 @@ const StudentProfile = () => {
 
   return (
     <div className="space-y-6 animate-pop">
-      <button onClick={() => navigate('/students')} className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-bold flex items-center gap-2 transition">
+      <button onClick={() => navigate('/students')} className="text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 font-bold flex items-center gap-2 transition">
         ← Back to Students
       </button>
 
       <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 opacity-5 text-9xl transform translate-x-4 -translate-y-4">🎓</div>
         
-        <div className="h-32 w-32 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-6xl font-bold border-4 border-white dark:border-slate-700 shadow-lg z-10">
-          {student.name.charAt(0).toUpperCase()}
-        </div>
+        {/* 🚀 PROFILE PHOTO (HD & SHARP) */}
+        {student.photo ? (
+          <img 
+            src={student.photo} 
+            alt={student.name} 
+            className="h-32 w-32 rounded-full object-cover border-4 border-green-500 shadow-xl z-10" 
+          />
+        ) : (
+          <div className="h-32 w-32 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-6xl font-bold border-4 border-white dark:border-slate-700 shadow-lg z-10">
+            {student.name.charAt(0).toUpperCase()}
+          </div>
+        )}
         
         <div className="text-center md:text-left z-10 flex-1">
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">{student.name}</h2>

@@ -62,7 +62,6 @@ const Layout = ({ children }) => {
 
   // 🎙️ Natural Voice (Hindi Female - Same as before)
   const speakText = (text) => {
-    // 🛑 Purani awaz ko rok do (agar chal rahi hai)
     window.speechSynthesis.cancel(); 
 
     const speech = new SpeechSynthesisUtterance(text);
@@ -83,13 +82,11 @@ const Layout = ({ children }) => {
 
   // 🚀 Mode Change Function
   const toggleMode = () => {
-    // 🛑 Mode change karte hi purani awaz rok do
     window.speechSynthesis.cancel();
 
     const newMode = !isCollegeMode;
     setIsCollegeMode(newMode);
     
-    // Jab button click ho, AI khud bataye
     const modeMsg = newMode 
       ? "Sir, main ab College Mode me hoon. Aap mujhse students ya attendance ke baare me pooch sakte hain." 
       : "Sir, main ab General Knowledge mode me hoon. Aap mujhse kuch bhi pooch sakte hain.";
@@ -103,7 +100,6 @@ const Layout = ({ children }) => {
     const messageToSend = textOverride || inputMsg;
     if (!messageToSend.trim()) return;
 
-    // 🛑 Naya message aate hi purani awaz rok do
     window.speechSynthesis.cancel();
 
     setMessages(prev => [...prev, { role: 'user', text: messageToSend }]);
@@ -138,11 +134,13 @@ const Layout = ({ children }) => {
       return;
     }
 
-    // 🛑 Mic dabate hi purani awaz rok do
     window.speechSynthesis.cancel();
 
     const recognition = new window.webkitSpeechRecognition();
-    recognition.lang = 'hi-IN';
+    
+    // 🚀 FIX: Language ko 'en-IN' kiya taaki Hinglish (English alphabets) me likhe
+    recognition.lang = 'en-IN'; 
+    
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsListening(true);

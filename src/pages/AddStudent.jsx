@@ -18,11 +18,32 @@ const AddStudent = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 🚀 IMAGE COMPRESSION LOGIC
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800; // 🚀 Width limit
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // 🚀 70% Quality (Size kam ho jayega)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7); 
+          
+          setImage(compressedBase64); 
+          setPreview(compressedBase64); 
+        };
+      };
     }
   };
 
@@ -32,18 +53,7 @@ const AddStudent = () => {
     setError('');
 
     try {
-      // 🚀 Image ko Base64 me convert karo
-      let photoBase64 = null;
-      if (image) {
-        photoBase64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(image);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (error) => reject(error);
-        });
-      }
-
-      const dataToSend = { ...formData, photoBase64 };
+      const dataToSend = { ...formData, photoBase64: image }; 
 
       await axios.post(`${API_BASE}/api/students/add`, dataToSend, {
         headers: { Authorization: `Bearer ${token}` },
@@ -80,7 +90,7 @@ const AddStudent = () => {
             Upload Student Photo
             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
           </label>
-          <p className="text-xs text-slate-500 mt-2">Clear face photo (For AI Attendance)</p>
+          <p className="text-xs text-slate-500 mt-2">Clear face photo (Auto-compressed for upload)</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
